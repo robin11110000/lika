@@ -1,0 +1,1207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lika</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #050505;
+      --surface: #0a0a0a;
+      --border: #1a1a1a;
+      --border-hover: #2a2a2a;
+      --text: #e8e8e8;
+      --text-dim: #666;
+      --text-muted: #444;
+      --accent: #fff;
+      --dot: #222;
+      --dot-active: #555;
+      --success: #888;
+      --error: #666;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Dot grid background */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-image: radial-gradient(circle, var(--dot) 1px, transparent 1px);
+      background-size: 32px 32px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .app {
+      position: relative;
+      z-index: 1;
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 80px 24px 120px;
+    }
+
+    /* Header */
+    .header {
+      margin-bottom: 80px;
+    }
+
+    .logo {
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.3em;
+      color: var(--text-dim);
+      margin-bottom: 32px;
+    }
+
+    .tagline {
+      font-size: 28px;
+      font-weight: 300;
+      line-height: 1.4;
+      color: var(--text);
+      max-width: 480px;
+    }
+
+    .tagline em {
+      font-style: normal;
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    /* Sections */
+    .section {
+      margin-bottom: 64px;
+    }
+
+    .section-label {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.2em;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+      text-transform: uppercase;
+    }
+
+    /* Wallet connection */
+    .wallet-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 24px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+
+    .wallet-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .wallet-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--text-muted);
+      transition: background 0.3s;
+    }
+
+    .wallet-dot.connected {
+      background: var(--accent);
+    }
+
+    .wallet-address {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: var(--text-dim);
+    }
+
+    .btn {
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      padding: 10px 20px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: transparent;
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn:hover {
+      border-color: var(--text-dim);
+      background: var(--surface);
+    }
+
+    .btn:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: var(--bg);
+      border-color: var(--accent);
+    }
+
+    .btn-primary:hover {
+      opacity: 0.9;
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.2;
+    }
+
+    /* Balances */
+    .balances {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 20px;
+    }
+
+    .balance-card {
+      padding: 20px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+
+    .balance-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      letter-spacing: 0.1em;
+      margin-bottom: 8px;
+    }
+
+    .balance-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 20px;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    .balance-unit {
+      font-size: 12px;
+      color: var(--text-dim);
+      margin-left: 4px;
+    }
+
+    .balance-sub {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+      margin-top: 4px;
+    }
+
+    /* Intent form */
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-label {
+      font-size: 12px;
+      color: var(--text-dim);
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .input {
+      width: 100%;
+      padding: 14px 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .input:focus {
+      border-color: var(--text-dim);
+    }
+
+    .input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .input-mono {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    select.input {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23666'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 16px center;
+      padding-right: 40px;
+      cursor: pointer;
+    }
+
+    /* Steps / Flow */
+    .flow-steps {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      margin-bottom: 32px;
+      padding: 0 4px;
+    }
+
+    .step-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--border);
+      transition: all 0.4s;
+      flex-shrink: 0;
+    }
+
+    .step-dot.active {
+      background: var(--accent);
+      box-shadow: 0 0 12px rgba(255,255,255,0.15);
+    }
+
+    .step-dot.done {
+      background: var(--text-dim);
+    }
+
+    .step-line {
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+      transition: background 0.4s;
+    }
+
+    .step-line.done {
+      background: var(--text-muted);
+    }
+
+    .step-labels {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 12px;
+    }
+
+    .step-label {
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      transition: color 0.3s;
+    }
+
+    .step-label.active {
+      color: var(--text);
+    }
+
+    .step-label.done {
+      color: var(--text-dim);
+    }
+
+    /* Review panel */
+    .review-panel {
+      padding: 24px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      margin-bottom: 20px;
+    }
+
+    .review-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .review-row:last-child {
+      border-bottom: none;
+    }
+
+    .review-key {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .review-val {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: var(--text);
+    }
+
+    /* Execution status */
+    .exec-status {
+      padding: 24px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+
+    .exec-step {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 12px 0;
+    }
+
+    .exec-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--border);
+      flex-shrink: 0;
+      transition: background 0.3s;
+    }
+
+    .exec-dot.active {
+      background: var(--accent);
+      animation: pulse 1.5s infinite;
+    }
+
+    .exec-dot.done {
+      background: var(--text-dim);
+    }
+
+    .exec-dot.error {
+      background: var(--error);
+    }
+
+    .exec-text {
+      font-size: 13px;
+      color: var(--text-muted);
+      transition: color 0.3s;
+    }
+
+    .exec-text.active {
+      color: var(--text);
+    }
+
+    .exec-text.done {
+      color: var(--text-dim);
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    /* Result */
+    .result-panel {
+      padding: 32px 24px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      text-align: center;
+    }
+
+    .result-dots {
+      display: flex;
+      justify-content: center;
+      gap: 4px;
+      margin-bottom: 24px;
+    }
+
+    .result-dots .dot {
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: var(--text-dim);
+    }
+
+    .result-title {
+      font-size: 18px;
+      font-weight: 400;
+      margin-bottom: 16px;
+    }
+
+    .result-tx {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--text-dim);
+      margin-bottom: 8px;
+    }
+
+    .result-tx a {
+      color: var(--text-dim);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    .result-tx a:hover {
+      color: var(--text);
+    }
+
+    .result-balances {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 16px;
+      align-items: center;
+      margin-top: 24px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+    }
+
+    .result-balance {
+      text-align: center;
+    }
+
+    .result-balance-label {
+      font-size: 10px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 4px;
+    }
+
+    .result-balance-val {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 16px;
+    }
+
+    .result-arrow {
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    /* Divider */
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 48px 0;
+    }
+
+    .divider-dots {
+      display: flex;
+      gap: 6px;
+    }
+
+    .divider-dots .dot {
+      width: 3px;
+      height: 3px;
+      border-radius: 50%;
+      background: var(--text-muted);
+    }
+
+    .divider-line {
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* Error */
+    .error-msg {
+      padding: 16px 20px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 13px;
+      color: var(--text-dim);
+      margin-top: 16px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Hidden */
+    .hidden {
+      display: none !important;
+    }
+
+    /* Fade in */
+    .fade-in {
+      animation: fadeIn 0.4s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Footer */
+    .footer {
+      margin-top: 80px;
+      padding-top: 32px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .footer-text {
+      font-size: 11px;
+      color: var(--text-muted);
+      letter-spacing: 0.05em;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 16px;
+    }
+
+    .footer-links a {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-decoration: none;
+    }
+
+    .footer-links a:hover {
+      color: var(--text-dim);
+    }
+
+    /* Network badge */
+    .network-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 11px;
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .network-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--text-muted);
+    }
+
+    .network-dot.live {
+      background: var(--accent);
+    }
+  </style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- Header -->
+  <header class="header">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px;">
+      <div class="logo">Lika</div>
+      <div class="network-badge">
+        <span class="network-dot" id="networkDot"></span>
+        Base Sepolia
+      </div>
+    </div>
+    <p class="tagline">
+      Tell an agent what you want.<br>
+      It <em>proves</em> it won't cheat,<br>
+      then executes on-chain.
+    </p>
+  </header>
+
+  <!-- Step 1: Connect Wallet -->
+  <section class="section" id="connectSection">
+    <div class="section-label">01 &mdash; Connect</div>
+    <div class="wallet-bar">
+      <div class="wallet-info">
+        <div class="wallet-dot" id="walletDot"></div>
+        <span class="wallet-address" id="walletAddress">Not connected</span>
+      </div>
+      <button class="btn" id="connectBtn" onclick="connectWallet()">Connect</button>
+    </div>
+
+    <div class="balances hidden" id="balancesGrid">
+      <div class="balance-card">
+        <div class="balance-label">YOUR WALLET</div>
+        <div class="balance-value"><span id="ownerUsdc">--</span><span class="balance-unit">USDC</span></div>
+        <div class="balance-sub" id="ownerAddr"></div>
+      </div>
+      <div class="balance-card">
+        <div class="balance-label">AGENT WALLET</div>
+        <div class="balance-value"><span id="agentUsdc">--</span><span class="balance-unit">USDC</span></div>
+        <div class="balance-sub" id="agentAddr"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Step 2: Build Intent -->
+  <section class="section hidden" id="intentSection">
+    <div class="section-label">02 &mdash; Intent</div>
+
+    <div class="form-group">
+      <label class="form-label">Action</label>
+      <select class="input" id="actionType">
+        <option value="TRANSFER">Transfer</option>
+      </select>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Token</label>
+        <select class="input" id="tokenSelect">
+          <option value="USDC">USDC</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Amount</label>
+        <input class="input input-mono" type="text" id="amount" placeholder="0.00">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Recipient</label>
+      <input class="input input-mono" type="text" id="recipient" placeholder="0x...">
+    </div>
+
+    <div style="margin-top: 24px;">
+      <button class="btn btn-primary" id="reviewBtn" onclick="reviewIntent()" disabled>Review Intent</button>
+    </div>
+  </section>
+
+  <!-- Step 3-6: Execution Flow -->
+  <section class="section hidden" id="execSection">
+    <div class="section-label">03 &mdash; Execute</div>
+
+    <!-- Progress dots -->
+    <div class="flow-steps">
+      <div class="step-dot" id="sd1"></div>
+      <div class="step-line" id="sl1"></div>
+      <div class="step-dot" id="sd2"></div>
+      <div class="step-line" id="sl2"></div>
+      <div class="step-dot" id="sd3"></div>
+      <div class="step-line" id="sl3"></div>
+      <div class="step-dot" id="sd4"></div>
+    </div>
+    <div class="step-labels">
+      <span class="step-label" id="slbl1">Review</span>
+      <span class="step-label" id="slbl2">Sign</span>
+      <span class="step-label" id="slbl3">Prove</span>
+      <span class="step-label" id="slbl4">Execute</span>
+    </div>
+
+    <!-- Review -->
+    <div id="reviewPanel" class="hidden" style="margin-top: 32px;">
+      <div class="review-panel">
+        <div class="review-row">
+          <span class="review-key">Action</span>
+          <span class="review-val" id="rvAction"></span>
+        </div>
+        <div class="review-row">
+          <span class="review-key">Token</span>
+          <span class="review-val" id="rvToken"></span>
+        </div>
+        <div class="review-row">
+          <span class="review-key">Amount</span>
+          <span class="review-val" id="rvAmount"></span>
+        </div>
+        <div class="review-row">
+          <span class="review-key">Recipient</span>
+          <span class="review-val" id="rvRecipient"></span>
+        </div>
+        <div class="review-row">
+          <span class="review-key">From</span>
+          <span class="review-val" id="rvFrom"></span>
+        </div>
+        <div class="review-row">
+          <span class="review-key">Nonce</span>
+          <span class="review-val" id="rvNonce"></span>
+        </div>
+        <div class="review-row">
+          <span class="review-key">Expires</span>
+          <span class="review-val" id="rvExpiry"></span>
+        </div>
+      </div>
+      <div style="display: flex; gap: 12px;">
+        <button class="btn" onclick="cancelExec()">Cancel</button>
+        <button class="btn btn-primary" id="signBtn" onclick="signAndExecute()">Sign & Execute</button>
+      </div>
+    </div>
+
+    <!-- Execution status -->
+    <div id="execStatus" class="hidden" style="margin-top: 32px;">
+      <div class="exec-status">
+        <div class="exec-step">
+          <div class="exec-dot" id="ed1"></div>
+          <span class="exec-text" id="et1">Requesting EIP-712 signature...</span>
+        </div>
+        <div class="exec-step">
+          <div class="exec-dot" id="ed2"></div>
+          <span class="exec-text" id="et2">Generating ZK proof...</span>
+        </div>
+        <div class="exec-step">
+          <div class="exec-dot" id="ed3"></div>
+          <span class="exec-text" id="et3">Submitting on-chain transaction...</span>
+        </div>
+        <div class="exec-step">
+          <div class="exec-dot" id="ed4"></div>
+          <span class="exec-text" id="et4">Waiting for confirmation...</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Error -->
+    <div id="execError" class="hidden">
+      <div class="error-msg" id="errorText"></div>
+      <div style="margin-top: 16px;">
+        <button class="btn" onclick="resetExec()">Try again</button>
+      </div>
+    </div>
+
+    <!-- Result -->
+    <div id="execResult" class="hidden" style="margin-top: 32px;">
+      <div class="result-panel fade-in">
+        <div class="result-dots">
+          <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+          <div class="dot"></div><div class="dot"></div>
+        </div>
+        <div class="result-title">Transaction confirmed</div>
+        <div class="result-tx" id="resultTx"></div>
+        <div class="result-tx">
+          <a id="resultLink" href="#" target="_blank">View on BaseScan</a>
+        </div>
+        <div class="result-balances">
+          <div class="result-balance">
+            <div class="result-balance-label">Before</div>
+            <div class="result-balance-val" id="resultBefore">--</div>
+          </div>
+          <div class="result-arrow">&rarr;</div>
+          <div class="result-balance">
+            <div class="result-balance-label">After</div>
+            <div class="result-balance-val" id="resultAfter">--</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top: 24px;">
+        <button class="btn" onclick="resetAll()">New intent</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <span class="footer-text">Lika Protocol</span>
+    <div class="footer-links">
+      <a href="https://sepolia.basescan.org" target="_blank">BaseScan</a>
+      <a href="https://github.com/lika" target="_blank">GitHub</a>
+    </div>
+  </footer>
+
+</div>
+
+<!-- ethers.js v6 CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.4/ethers.umd.min.js"></script>
+
+<script>
+// ============================================================
+// CONFIG
+// ============================================================
+const CONFIG = {
+  chainId: 84532,
+  chainIdHex: '0x14a34',
+  chainName: 'Base Sepolia',
+  rpcUrl: 'https://sepolia.base.org',
+  explorer: 'https://sepolia.basescan.org',
+  contracts: {
+    AgentWallet: '0x4D7c95c0dd8840CD597DF7D75fb2D7ADc08bA0AA',
+    MockUSDC:    '0xE66D20A340e3F45C55d3A7cfB6b25458d9b0d193',
+    Verifier:    '0xE004ff1dE5009b12c11DE00616Ac7a28437e3475',
+    Adapter:     '0x7206d80BA38EDFd439951339eEAd95E3f301d8C8',
+  },
+  ownerAddress: '0x77A93ecD2437DA60aAFDBF595e74e0317b0d0B47',
+};
+
+// Minimal ABIs (only the functions we need)
+const WALLET_ABI = [
+  'function owner() view returns (address)',
+  'function agent() view returns (address)',
+  'function domainSeparator() view returns (bytes32)',
+  'function isNonceUsed(bytes32 nonce) view returns (bool)',
+  'function executeWithProof(bytes proof, bytes signature, tuple(bytes32 commitment, uint256 chainId, address signerAddress, bytes32 multicallDataHash, bytes32 nonce, uint256 expiry) publicInputs, tuple(address target, uint256 value, bytes data)[] calls)',
+  'function executeDirectly(bytes signature, bytes32 nonce, uint256 expiry, tuple(address target, uint256 value, bytes data)[] calls)',
+  'event IntentExecuted(bytes32 indexed intentId, address indexed signer, bytes32 nonce, uint256 callCount, uint256 gasUsed)',
+];
+
+const ERC20_ABI = [
+  'function balanceOf(address) view returns (uint256)',
+  'function decimals() view returns (uint8)',
+  'function symbol() view returns (string)',
+  'function transfer(address to, uint256 amount) returns (bool)',
+  'function approve(address spender, uint256 amount) returns (bool)',
+];
+
+// ============================================================
+// STATE
+// ============================================================
+let provider = null;
+let signer = null;
+let userAddress = null;
+let walletContract = null;
+let usdcContract = null;
+let currentIntent = null;
+
+// ============================================================
+// WALLET CONNECTION
+// ============================================================
+async function connectWallet() {
+  if (!window.ethereum) {
+    alert('Please install MetaMask to use this app.');
+    return;
+  }
+
+  try {
+    const btn = document.getElementById('connectBtn');
+    btn.textContent = '...';
+    btn.disabled = true;
+
+    // Request accounts
+    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+    userAddress = accounts[0];
+
+    // Check/switch network
+    const chainId = await window.ethereum.request({ method: 'eth_chainId' });
+    if (chainId !== CONFIG.chainIdHex) {
+      try {
+        await window.ethereum.request({
+          method: 'wallet_switchEthereumChain',
+          params: [{ chainId: CONFIG.chainIdHex }],
+        });
+      } catch (switchError) {
+        if (switchError.code === 4902) {
+          await window.ethereum.request({
+            method: 'wallet_addEthereumChain',
+            params: [{
+              chainId: CONFIG.chainIdHex,
+              chainName: CONFIG.chainName,
+              rpcUrls: [CONFIG.rpcUrl],
+              blockExplorerUrls: [CONFIG.explorer],
+              nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
+            }],
+          });
+        } else {
+          throw switchError;
+        }
+      }
+    }
+
+    // Setup providers and contracts
+    provider = new ethers.BrowserProvider(window.ethereum);
+    signer = await provider.getSigner();
+    userAddress = await signer.getAddress();
+
+    walletContract = new ethers.Contract(CONFIG.contracts.AgentWallet, WALLET_ABI, provider);
+    usdcContract = new ethers.Contract(CONFIG.contracts.MockUSDC, ERC20_ABI, provider);
+
+    // Update UI
+    document.getElementById('walletDot').classList.add('connected');
+    document.getElementById('networkDot').classList.add('live');
+    document.getElementById('walletAddress').textContent = truncAddr(userAddress);
+    btn.textContent = 'Connected';
+
+    // Load balances
+    await loadBalances();
+
+    // Show intent section
+    document.getElementById('balancesGrid').classList.remove('hidden');
+    document.getElementById('intentSection').classList.remove('hidden');
+    document.getElementById('intentSection').classList.add('fade-in');
+    enableReviewBtn();
+
+    // Listen for account/chain changes
+    window.ethereum.on('accountsChanged', () => location.reload());
+    window.ethereum.on('chainChanged', () => location.reload());
+
+  } catch (err) {
+    console.error('Connection failed:', err);
+    const btn = document.getElementById('connectBtn');
+    btn.textContent = 'Connect';
+    btn.disabled = false;
+  }
+}
+
+async function loadBalances() {
+  try {
+    const [ownerBal, agentBal] = await Promise.all([
+      usdcContract.balanceOf(userAddress),
+      usdcContract.balanceOf(CONFIG.contracts.AgentWallet),
+    ]);
+
+    document.getElementById('ownerUsdc').textContent = ethers.formatUnits(ownerBal, 6);
+    document.getElementById('agentUsdc').textContent = ethers.formatUnits(agentBal, 6);
+    document.getElementById('ownerAddr').textContent = truncAddr(userAddress);
+    document.getElementById('agentAddr').textContent = truncAddr(CONFIG.contracts.AgentWallet);
+  } catch (err) {
+    console.error('Balance load failed:', err);
+  }
+}
+
+// ============================================================
+// INTENT BUILDING
+// ============================================================
+function enableReviewBtn() {
+  const amount = document.getElementById('amount');
+  const recipient = document.getElementById('recipient');
+  const btn = document.getElementById('reviewBtn');
+
+  const check = () => {
+    const hasAmount = amount.value.trim() !== '' && parseFloat(amount.value) > 0;
+    const hasRecipient = recipient.value.trim().length === 42 && recipient.value.startsWith('0x');
+    btn.disabled = !(hasAmount && hasRecipient);
+  };
+
+  amount.addEventListener('input', check);
+  recipient.addEventListener('input', check);
+}
+
+function reviewIntent() {
+  const actionType = document.getElementById('actionType').value;
+  const token = document.getElementById('tokenSelect').value;
+  const amount = document.getElementById('amount').value.trim();
+  const recipient = document.getElementById('recipient').value.trim();
+
+  // Generate nonce (31 bytes to fit in BN254 field)
+  const randomBytes = new Uint8Array(31);
+  crypto.getRandomValues(randomBytes);
+  const nonce = '0x00' + Array.from(randomBytes).map(b => b.toString(16).padStart(2, '0')).join('');
+
+  const expiry = Math.floor(Date.now() / 1000) + 600; // 10 minutes
+
+  currentIntent = {
+    actionType, token, amount, recipient, nonce, expiry,
+    tokenAddress: CONFIG.contracts.MockUSDC,
+    walletAddress: CONFIG.contracts.AgentWallet,
+  };
+
+  // Show execution section
+  document.getElementById('execSection').classList.remove('hidden');
+  document.getElementById('execSection').classList.add('fade-in');
+  document.getElementById('reviewPanel').classList.remove('hidden');
+  document.getElementById('execStatus').classList.add('hidden');
+  document.getElementById('execResult').classList.add('hidden');
+  document.getElementById('execError').classList.add('hidden');
+
+  // Fill review
+  document.getElementById('rvAction').textContent = actionType;
+  document.getElementById('rvToken').textContent = token;
+  document.getElementById('rvAmount').textContent = amount + ' ' + token;
+  document.getElementById('rvRecipient').textContent = truncAddr(recipient);
+  document.getElementById('rvFrom').textContent = truncAddr(CONFIG.contracts.AgentWallet);
+  document.getElementById('rvNonce').textContent = nonce.slice(0, 14) + '...';
+  document.getElementById('rvExpiry').textContent = new Date(expiry * 1000).toLocaleTimeString();
+
+  // Set step 1 active
+  setStep(1);
+
+  // Scroll to exec section
+  document.getElementById('execSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ============================================================
+// SIGN & EXECUTE
+// ============================================================
+async function signAndExecute() {
+  const intent = currentIntent;
+  if (!intent) return;
+
+  document.getElementById('reviewPanel').classList.add('hidden');
+  document.getElementById('execStatus').classList.remove('hidden');
+  document.getElementById('execError').classList.add('hidden');
+  document.getElementById('signBtn').disabled = true;
+
+  try {
+    // ── Step 1: Sign ──────────────────────────────────
+    setStep(2);
+    setExecStep(1, 'active');
+
+    const amountWei = ethers.parseUnits(intent.amount, 6);
+
+    // Derive calldata: ERC20.transfer(recipient, amount)
+    const erc20Iface = new ethers.Interface(['function transfer(address to, uint256 amount) returns (bool)']);
+    const transferCalldata = erc20Iface.encodeFunctionData('transfer', [intent.recipient, amountWei]);
+
+    const calls = [{
+      target: intent.tokenAddress,
+      value: 0n,
+      data: transferCalldata,
+    }];
+
+    // Compute multicallDataHash
+    const coder = ethers.AbiCoder.defaultAbiCoder();
+    const encodedCalls = coder.encode(
+      ['tuple(address target, uint256 value, bytes data)[]'],
+      [calls]
+    );
+    const multicallDataHash = ethers.keccak256(encodedCalls);
+
+    // Get domain separator from contract
+    const domainSeparator = await walletContract.domainSeparator();
+
+    // For the frontend demo, we use executeDirectly (signature only, no ZK proof)
+    // This is simpler and still demonstrates the full flow.
+    // The ZK path (executeWithProof) requires Poseidon hashing + snarkjs in browser,
+    // which would need ~5MB of WASM. For demo we show the signature flow.
+    //
+    // The commitment for signing is the keccak256 of the calls + nonce + expiry
+    const commitment = ethers.keccak256(
+      coder.encode(
+        ['bytes32', 'uint256', 'tuple(address target, uint256 value, bytes data)[]'],
+        [intent.nonce, intent.expiry, calls]
+      )
+    );
+
+    // EIP-712 digest: \x19\x01 + domainSeparator + commitment
+    const digest = ethers.keccak256(
+      ethers.solidityPacked(
+        ['bytes1', 'bytes1', 'bytes32', 'bytes32'],
+        ['0x19', '0x01', domainSeparator, commitment]
+      )
+    );
+
+    // Sign the raw digest (not EIP-712 typed, since the contract expects raw sig over commitment)
+    const signature = await signer.signMessage(ethers.getBytes(digest));
+
+    setExecStep(1, 'done');
+    document.getElementById('et1').textContent = 'Signature obtained';
+
+    // ── Step 2: Generate proof ────────────────────────
+    setStep(3);
+    setExecStep(2, 'active');
+
+    // For executeDirectly, we skip ZK proof generation
+    // In production, this would call the prover service
+    await sleep(800); // Brief pause for UX
+
+    setExecStep(2, 'done');
+    document.getElementById('et2').textContent = 'Using direct execution path';
+
+    // ── Step 3: Submit transaction ────────────────────
+    setStep(3);
+    setExecStep(3, 'active');
+
+    // We need the agent's private key to submit (agent calls executeDirectly)
+    // For the demo, we use a read-only provider with the agent key
+    const agentKey = '0x003468c10bc1e8e477218d717fe1ddc0c13a08a4c188cde358bf9c64839fff4b';
+    const rpcProvider = new ethers.JsonRpcProvider(CONFIG.rpcUrl);
+    const agentSigner = new ethers.Wallet(agentKey, rpcProvider);
+    const walletWithAgent = new ethers.Contract(CONFIG.contracts.AgentWallet, WALLET_ABI, agentSigner);
+
+    // Save before-balance
+    const beforeBal = await usdcContract.balanceOf(CONFIG.contracts.AgentWallet);
+
+    const tx = await walletWithAgent.executeDirectly(
+      signature,
+      intent.nonce,
+      intent.expiry,
+      calls,
+      { gasLimit: 300000 }
+    );
+
+    setExecStep(3, 'done');
+    document.getElementById('et3').textContent = 'Transaction submitted';
+
+    // ── Step 4: Wait for confirmation ─────────────────
+    setStep(4);
+    setExecStep(4, 'active');
+
+    const receipt = await tx.wait();
+
+    setExecStep(4, 'done');
+    document.getElementById('et4').textContent = 'Confirmed in block ' + receipt.blockNumber;
+
+    // ── Show result ───────────────────────────────────
+    await sleep(500);
+
+    // Load after-balance
+    const afterBal = await usdcContract.balanceOf(CONFIG.contracts.AgentWallet);
+
+    document.getElementById('resultTx').textContent = truncAddr(tx.hash, 16);
+    document.getElementById('resultLink').href = CONFIG.explorer + '/tx/' + tx.hash;
+    document.getElementById('resultBefore').textContent = ethers.formatUnits(beforeBal, 6) + ' USDC';
+    document.getElementById('resultAfter').textContent = ethers.formatUnits(afterBal, 6) + ' USDC';
+
+    document.getElementById('execStatus').classList.add('hidden');
+    document.getElementById('execResult').classList.remove('hidden');
+
+    // Refresh main balances
+    await loadBalances();
+
+  } catch (err) {
+    console.error('Execution failed:', err);
+    document.getElementById('execStatus').classList.add('hidden');
+    document.getElementById('execError').classList.remove('hidden');
+    document.getElementById('errorText').textContent = err.reason || err.message || 'Transaction failed';
+  }
+}
+
+// ============================================================
+// UI HELPERS
+// ============================================================
+function setStep(n) {
+  for (let i = 1; i <= 4; i++) {
+    const dot = document.getElementById('sd' + i);
+    const label = document.getElementById('slbl' + i);
+    dot.className = 'step-dot' + (i < n ? ' done' : i === n ? ' active' : '');
+    label.className = 'step-label' + (i < n ? ' done' : i === n ? ' active' : '');
+    if (i < 4) {
+      document.getElementById('sl' + i).className = 'step-line' + (i < n ? ' done' : '');
+    }
+  }
+}
+
+function setExecStep(n, state) {
+  document.getElementById('ed' + n).className = 'exec-dot ' + state;
+  document.getElementById('et' + n).className = 'exec-text ' + state;
+}
+
+function cancelExec() {
+  document.getElementById('execSection').classList.add('hidden');
+  currentIntent = null;
+}
+
+function resetExec() {
+  document.getElementById('execError').classList.add('hidden');
+  document.getElementById('execStatus').classList.add('hidden');
+  document.getElementById('reviewPanel').classList.remove('hidden');
+  document.getElementById('signBtn').disabled = false;
+  setStep(1);
+}
+
+function resetAll() {
+  document.getElementById('execSection').classList.add('hidden');
+  document.getElementById('execResult').classList.add('hidden');
+  document.getElementById('amount').value = '';
+  document.getElementById('recipient').value = '';
+  document.getElementById('reviewBtn').disabled = true;
+  currentIntent = null;
+  loadBalances();
+}
+
+function truncAddr(addr, len = 6) {
+  if (!addr) return '';
+  if (addr.length <= len * 2 + 2) return addr;
+  return addr.slice(0, len + 2) + '...' + addr.slice(-len);
+}
+
+function sleep(ms) {
+  return new Promise(r => setTimeout(r, ms));
+}
+</script>
+
+</body>
+</html>

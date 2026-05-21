@@ -1,0 +1,42 @@
+{
+  "base_sepolia": {
+    "chainId": 84532,
+    "rpcUrl": "https://base-sepolia.infura.io/v3/1be13a4d19414b35b8091e68f0405a3f",
+    "blockExplorer": "https://sepolia.basescan.org",
+    "contracts": {
+      "AgentWallet": "0x24E2942e8E218a6d635d4bFfeE5A79c7aeC11928",
+      "MockUSDC": "0x43bbC154FCae9F149a9DE92C06548c33e4666788",
+      "Groth16Verifier": "0xea5b3d244261402Cc497C7b2cC8DEf978982A105",
+      "Groth16VerifierAdapter": "0xc06C93E952e252fB6a7D124ba8Aa88A9779F06cc"
+    },
+    "wallets": {
+      "owner": "0x77A93ecD2437DA60aAFDBF595e74e0317b0d0B47",
+      "agent": "0x17C3771F0250b2774AA11b793Deb523d2D914E03"
+    },
+    "timestamp": "2026-02-21T08:15:44.082Z"
+  },
+  "base": {
+    "chainId": 8453,
+    "rpcUrl": "https://mainnet.base.org",
+    "blockExplorer": "https://basescan.org",
+    "contracts": {},
+    "wallets": {}
+  },
+  "ethereum_sepolia": {
+    "chainId": 11155111,
+    "rpcUrl": "https://rpc.sepolia.org",
+    "blockExplorer": "https://sepolia.etherscan.io",
+    "contracts": {},
+    "wallets": {}
+  },
+  "kite_testnet": {
+    "chainId": 2368,
+    "rpcUrl": "https://rpc-testnet.gokite.ai",
+    "blockExplorer": "https://testnet.kitescan.ai",
+    "contracts": {},
+    "wallets": {
+      "owner": "0x77A93ecD2437DA60aAFDBF595e74e0317b0d0B47",
+      "agent": "0x17C3771F0250b2774AA11b793Deb523d2D914E03"
+    }
+  }
+}
